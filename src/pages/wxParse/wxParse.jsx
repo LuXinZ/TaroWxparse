@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Taro from '@tarojs/taro'
 import { View,Block,Image,Button,Video,Text } from '@tarojs/components'
 import HtmlToJson from './utils/html2json';
 import showdown from './utils/showdown.js';
@@ -23,7 +24,7 @@ class WxParse extends Component {
   }
   _parseNodes = (nodes) => {
     // 设置页面唯一键值标识符
-    const allPages = getCurrentPages()
+    const allPages = Taro.getCurrentPages()
     const currentPage = allPages[allPages.length - 1]
     this.pageNodeKey = `${BIND_NAME}_${currentPage.__wxExparserNodeId__}`
 
@@ -64,7 +65,6 @@ class WxParse extends Component {
       const recal = this._wxAutoImageCal(width, height)
       let newArray =this.state.nodesData
       newArray[index].loaded =true
-      console.log ()
       this.setState({
         width: recal.imageWidth,
         height: recal.imageHeight,
