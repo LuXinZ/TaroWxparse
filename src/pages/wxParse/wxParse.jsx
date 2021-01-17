@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View,Block,Image,Button,Video } from '@tarojs/components'
+import { View,Block,Image,Button,Video,Text } from '@tarojs/components'
 import HtmlToJson from './utils/html2json';
 import showdown from './utils/showdown.js';
 import { getSystemInfo, cacheInstance } from './utils/util';
@@ -220,7 +220,7 @@ class WxParse extends Component {
 
 
               {/*<!-- video类型 -->*/}
-              {item.tag == 'video' &&  <Block>
+              {item.tag === 'video' &&  <Block>
                 {/*<!--增加video标签支持，并循环添加-->*/}
                 <View className={classNames(`${item.classStr}`, `wxParse-${item.tag}`)} style={item.styleStr}>
                   <Video className={classNames (`${item.classStr}`, `wxParse-${item.tag}-video`)} src={item.attr.src} />
@@ -252,7 +252,7 @@ class WxParse extends Component {
                     mode='widthFix'
                     style={{width:`${item.attr.width || width}px;height:${item.attr.height || height}px; ${item.styleStr}`}}
                   />
-                  {!item.loaded && <Image className='img-loading' src={require('../images/loading.png')} />}
+                  {!item.loaded && <Image className='img-loading' src={require('./images/loading.png')} />}
                 </View>}
               </Block>}
 
@@ -350,25 +350,27 @@ class WxParse extends Component {
 
 
               {/*<!-- 其它内联标签 -->*/}
-              {/*<View wx:else className="{{item.classStr}} wxParse-{{item.tag}} wxParse-{{item.tagType}}"
-                     style="{{item.styleStr}}">
-                <Block wx:for="{{item.nodes}}" wx:for-index="index" wx:key="index" wx:for-item="child">
-                  <wxParse nodes="{{child}}"></wxParse>
-                </Block>
-              </View> */}
+              {(item.tagType !== 'block' && item.tag !== 'br' && item.tag !== 'audio' && item.tag !== 'td' && item.tag !== 'tr' && item.tag !== 'table' && item.tag !== 'a' && item.tag !== 'img' && item.tag !== 'video' && item.tag !== 'li' && item.tag !== 'ol' && item.tag !== 'ul') &&   <View className={classNames(`${item.classStr}`, `wxParse-${item.tag}`, `wxParse-${item.tagType}`)} style={item.styleStr}>
+                {item.nodes.map((child,index) => {
+                  return  <Block>
+                    <WxParse nodes={child} />
+                  </Block>
+                })}
+              </View> }
+
             </Block>}
 
 
             {/*<!-- 判断是否为文本节点 -->*/}
-            {item.node == 'text' &&  <Block>
-              <View className='WxEmojiView wxParse-inline' style='{{item.styleStr}}'>
+            {item.node === 'text' &&  <Block>
+              <View className={classNames('WxEmojiView', 'wxParse-inline')} style={item.styleStr}>
                 {item.textArray.map((textItem,index) => {
                   return <Block>
-                    {textItem.node == 'text' &&   <Block className="{{textItem.text == '\\n' ? 'wxParse-hide':''}}">
-                      <text selectable='{{true}}'>{textItem.text}</text>
+                    {textItem.node === 'text' &&   <Block className={classNames(`${textItem.text === '\\n' ? 'wxParse-hide':''}`)}>
+                      <Text selectable>{textItem.text}</Text>
                     </Block>}
-                    {textItem.node == 'element' &&   <Block>
-                      <Image className='wxEmoji' src='{{textItem.baseSrc}}{{textItem.text}}' />
+                    {textItem.node === 'element' &&   <Block>
+                      <Image className='wxEmoji' src={`${textItem.baseSrc}${textItem.text}`} />
                     </Block>}
 
                   </Block>
